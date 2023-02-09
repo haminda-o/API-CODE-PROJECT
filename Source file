@@ -1,0 +1,58 @@
+const express = require('express');
+const app = express();
+const port = 3000;
+
+let todoList = [
+  {
+    id: 1,
+    task: 'Learn Node.js',
+  },
+  {
+    id: 2,
+    task: 'Create a RESTful API',
+  },
+  {
+    id: 3,
+    task: 'Publish the project',
+  },
+];
+
+// Retrieve all items in the to-do list
+app.get('/todos', (req, res) => {
+  res.json(todoList);
+});
+
+// Retrieve a specific item in the to-do list
+app.get('/todos/:id', (req, res) => {
+  const todo = todoList.find((t) => t.id === parseInt(req.params.id));
+
+  if (!todo) {
+    return res.status(404).send('The to-do item with the given ID was not found.');
+  }
+
+  res.json(todo);
+});
+
+// Add a new item to the to-do list
+app.post('/todos', (req, res) => {
+  const maxId = Math.max(...todoList.map((t) => t.id));
+  const newTodo = { id: maxId + 1, task: req.body.task };
+  todoList.push(newTodo);
+  res.json(newTodo);
+});
+
+// Delete an item from the to-do list
+app.delete('/todos/:id', (req, res) => {
+  const todoIndex = todoList.findIndex((t) => t.id === parseInt(req.params.id));
+
+  if (todoIndex === -1) {
+    return res.status(404).send('The to-do item with the given ID was not found.');
+  }
+
+  const deletedTodo = todoList.splice(todoIndex, 1);
+  res.json(deletedTodo);
+});
+
+app.listen(port, () => {
+  console.log(`To-do API listening at http://localhost:${port}`);
+});
